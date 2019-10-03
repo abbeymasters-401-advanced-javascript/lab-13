@@ -92,6 +92,15 @@ describe('books api', () => {
           .delete(`/api/books/${book._id}`)
           .set('Authorization', user.token)
           .expect(200);
+      })
+      .then(() => {
+        return request
+          .get('/api/books')
+          .set('Authorization', user.token)
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.length).toBe(0);
+          });
       });
   });
 
