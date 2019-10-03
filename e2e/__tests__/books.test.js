@@ -16,6 +16,15 @@ describe('books api', () => {
     author: 'chimamanda ngozi adichie'
   };
 
+  function postBook(book) {
+    return request
+      .post('/api/books')
+      .set('Authorization', user.token)
+      .send(book)
+      .expect(200)
+      .then(({ body }) => body);
+  }
+
   it('posts a book', () => {
     return request
       .post('/api/books')
@@ -41,4 +50,23 @@ describe('books api', () => {
         );
       });
   });
+
+  it('gets all of the books', () => {
+    return Promise.all([
+      postBook(book),
+      postBook(book),
+      postBook(book)
+    ])
+      .then(() => {
+        return request
+          .get('/api/books')
+          .set('Authorization', user.token)
+          .expect(200);
+      })
+      .then(({ body }) => {
+        expect(body.length).toBe(3);
+        expect(body[0].owner).toBe(user._id);
+      });
+  });
+
 });
