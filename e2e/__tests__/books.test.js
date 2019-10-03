@@ -69,4 +69,30 @@ describe('books api', () => {
       });
   });
 
+  it('updates a book', () => {
+    return postBook(book)
+      .then(book => {
+        book.author = 'abbey m';
+        return request
+          .put(`/api/books/${book._id}`)
+          .send(book)
+          .set('Authorization', user.token)
+          .expect(200);
+      })
+      .then(({ body }) => {
+        expect(body.author).toBe('abbey m');
+        expect(body.owner).toBe(user._id);
+      });
+  });
+
+  it('deletes a book', () => {
+    return postBook(book)
+      .then(book => {
+        return request
+          .delete(`/api/books/${book._id}`)
+          .set('Authorization', user.token)
+          .expect(200);
+      });
+  });
+
 });
