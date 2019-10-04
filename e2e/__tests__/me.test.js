@@ -71,13 +71,11 @@ describe('books api', () => {
   it('deletes a favorite', () => {
     return putBook(book)
       .then(favorites => {
-        console.log(favorites);
         return request
           .delete(`/api/me/favorites/${favorites[0]}`)
           .set('Authorization', user.token)
           .expect(200)
           .then(({ body }) => {
-            console.log(body);
             expect(body.length).toBe(0);
           });
       });

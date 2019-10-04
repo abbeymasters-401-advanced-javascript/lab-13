@@ -2,6 +2,7 @@ const request = require('../request');
 const { dropCollection } = require('../db');
 const jwt = require('jsonwebtoken');
 const { signupUser } = require('../data-helpers');
+const User = require('../../lib/models/user');
 
 describe('Auth API', () => {
 
@@ -72,7 +73,7 @@ describe('Auth API', () => {
     });
   }
 
-  testBadSignup('rejects bad password', { 
+  testBadSignup('rejects bad password', {
     email: testUser.email,
     password: 'bad password'
   });
@@ -96,4 +97,82 @@ describe('Auth API', () => {
       .expect(401);
   });
 
+});
+
+
+describe('Auth Admin Users', () => {
+
+  const adminTest = {
+    email: 'alex@hellohello.com',
+    password: 'abc123'
+  };
+
+  const louslyOlUser = {
+    email: 'wassup@hellohello.com',
+    password: 'abc123'
+  };
+
+  function signinAdminUser(admin = adminTest) {
+    return request
+      .post('/api/auth/signin')
+      .send(admin)
+      .expect(200)
+      .then(({ body }) => body);
+  }
+
+  it('allows admin to make changes to users', () => {
+    return signupUser(adminTest)
+      .then(user => {
+        return User.updateById(user._id,
+          {
+            $addToSet: {
+              roles: 'admin'
+            }
+          }
+        );
+      })
+      .then(() => {
+        return Promise.all([
+          signinAdminUser(),
+          signupUser(louslyOlUser)
+        ])
+          .then(([adminUser, user]) => {
+            return request
+              .put(`/api/auth/users/${user._id}/roles/admin`)
+              .set('Authorization', adminUser.token)
+              .expect(200)
+              .then(({ body }) => {
+                console.log(body);
+              });
+          });
+      });
+  });
+
+  const newUser = {
+    email: 'abbey@123.com',
+    password: '123'
+  };
+
+  it('removes role from user', () => {
+    return Promise.all([
+      signinAdminUser(),
+      signupUser(newUser)
+    ])
+      .then(([adminUser, newUser]) => {
+        return request
+          .put(`/api/auth/users/${newUser._id}/roles/admin`)
+          .set('Authorization', adminUser.token)
+          .expect(200)
+          .then(({ body }) => {
+            console.log(body);
+            return request
+              .delete(`/api/auth/users/${body._id}/roles/admin`)
+              .set('Authorization', adminUser.token)
+              .expect(200)
+              .then(({ body }) => {
+                console.log(body);
+              });
+          });
+      });
+  });
 });
