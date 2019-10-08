@@ -142,7 +142,7 @@ describe('Auth Admin Users', () => {
               .set('Authorization', adminUser.token)
               .expect(200)
               .then(({ body }) => {
-                console.log(body);
+                expect(body.roles[0]).toBe('admin');
               });
           });
       });
@@ -170,7 +170,47 @@ describe('Auth Admin Users', () => {
               .set('Authorization', adminUser.token)
               .expect(200)
               .then(({ body }) => {
+                expect(body.roles[0]).toBe(undefined);
+              });
+          });
+      });
+  });
+
+  // function postUser(user) {
+  //   return request
+  //     .post('/api/users')
+  //     .set('Authorization', user.token)
+  //     .send(user)
+  //     .expect(200)
+  //     .then(({ body }) => body);
+  // }
+
+  it('gets all users', () => {
+    return Promise.all([
+      signinAdminUser(),
+      signupUser({
+        email: 'kabir@gmail.com',
+        password: 'abc123'
+      }),
+      signupUser({
+        email: 'abbey@gmail.com',
+        password: '1234'
+      })
+    ])
+      // eslint-disable-next-line no-unused-vars
+      .then(([adminUser, userOne, userTwo]) => {
+        return request
+          .put(`/api/auth/users/${userTwo._id}/roles/admin`)
+          .set('Authorization', adminUser.token)
+          .expect(200)
+          .then(() => {
+            return request
+              .get('/api/auth/users')
+              .set('Authorization', adminUser.token)
+              .expect(200)
+              .then(({ body }) => {
                 console.log(body);
+                expect(body.length).toBe(6);
               });
           });
       });
