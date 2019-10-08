@@ -209,7 +209,6 @@ describe('Auth Admin Users', () => {
               .set('Authorization', adminUser.token)
               .expect(200)
               .then(({ body }) => {
-                console.log(body);
                 expect(body.length).toBe(6);
               });
           });
