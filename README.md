@@ -5,10 +5,9 @@
 ### Author: Abbey Masters
 
 ### Links and Resources
-* [submission PR]()
-* [travis]()
+* [submission PR](https://github.com/abbeymasters-401-advanced-javascript/lab-13/pull/1)
+* [travis](https://travis-ci.com/abbeymasters-401-advanced-javascript/lab-13/builds/130851141)
 * [heroku]()
-
 
 #### Running the app
 

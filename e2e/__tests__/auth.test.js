@@ -176,14 +176,6 @@ describe('Auth Admin Users', () => {
       });
   });
 
-  // function postUser(user) {
-  //   return request
-  //     .post('/api/users')
-  //     .set('Authorization', user.token)
-  //     .send(user)
-  //     .expect(200)
-  //     .then(({ body }) => body);
-  // }
 
   it('gets all users', () => {
     return Promise.all([
